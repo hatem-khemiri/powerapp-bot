@@ -1,10 +1,11 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
-  const providedKey = req.headers['x-api-key'];
-  if (!providedKey || providedKey !== process.env.BOT_KEY) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+const authHeader = req.headers['authorization'] || '';
+const providedKey = authHeader.replace('Bearer ', '');
+if (!providedKey || providedKey !== process.env.BOT_KEY) {
+  return res.status(401).json({ error: 'Unauthorized' });
+}
 
   const { message, context } = req.body || {};
   if (!message) return res.status(400).json({ error: 'message required' });

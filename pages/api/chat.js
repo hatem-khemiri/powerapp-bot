@@ -1,21 +1,21 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
-const authHeader = req.headers['authorization'] || '';
-const providedKey = authHeader.replace('Bearer ', '');
-if (!providedKey || providedKey !== process.env.BOT_KEY) {
-  return res.status(401).json({ error: 'Unauthorized' });
-}
+  // Récupérer le Bearer token
+  const authHeader = req.headers['authorization'] || '';
+  const providedKey = authHeader.replace('Bearer ', '');
+  if (!providedKey || providedKey !== process.env.BOT_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
 
   const { message, context } = req.body || {};
   if (!message) return res.status(400).json({ error: 'message required' });
 
-  // Préparation du prompt
   const contextText = context ? JSON.stringify(context, null, 2) : 'Aucun contexte';
   const prompt = `Tu es un assistant utile. Utilise le contexte si nécessaire.\nContexte:\n${contextText}\nUtilisateur: ${message}\nAssistant:`;
 
   try {
-    const hfRes = await fetch(`https://api-inference.huggingface.co/models/dbddv01/gpt2-french-small`, {
+    const hfRes = await fetch(`https://api-inference.huggingface.co/models/${process.env.HF_MODEL}`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.HF_API_KEY}`,
@@ -38,7 +38,7 @@ if (!providedKey || providedKey !== process.env.BOT_KEY) {
 
     res.status(200).json({ reply: reply.trim() });
   } catch (err) {
-    console.error(err);
+    console.error(err);  // Les logs Vercel vont montrer l’erreur exacte
     res.status(500).json({ error: 'backend error', details: String(err) });
   }
 }

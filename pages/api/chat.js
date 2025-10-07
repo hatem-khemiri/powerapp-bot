@@ -16,16 +16,16 @@ export default async function handler(req, res) {
 
   try {
     const hfRes = await fetch(`https://api-inference.huggingface.co/models/${process.env.HF_MODEL}`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.HF_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        inputs: prompt,
-        parameters: { max_new_tokens: 150 }
-      })
-    });
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${process.env.HF_API_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    inputs: prompt,
+    parameters: { max_new_tokens: 150 }
+  })
+});
 
     const hfData = await hfRes.json();
 
